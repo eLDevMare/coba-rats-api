@@ -17,23 +17,19 @@ class AuthController extends Controller
            'password' => 'required|min:6',
         ]);
 
-        if($validate->fails()){
-            return response()->json($validate->errors(),400);
-        }
+        if($validate->fails())return response()->json($validate->errors(),400);
 
         User::query()->create([
             'username' => $request->username,
             'password' => Hash::make($request->password)
         ]);
 
-
         if(!$token = Auth::attempt($request->only('username','password'))){
             return  response()->json([
                 'status' => false,
                 'message' => 'Unauthorized'
-            ]);
+            ], 401);
         }
-
 
         return response()->json([
             'status' => true,
