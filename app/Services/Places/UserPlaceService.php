@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Places;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
-class PlaceService
+class UserPlaceService
 {
     public function getGame($bokingId)
     {
@@ -29,6 +29,46 @@ class PlaceService
         return $game;
     }
 
+
+    public function formatData($game, $bokingId,)
+    {
+        $description = DB::table('descriptions')
+            ->where('id', $game->first()->places_description)
+            ->first()
+            ->description;
+
+        $title = DB::table('titles')
+            ->where('id', $bokingId)
+            ->first()
+            ->title;
+
+
+        $group = $game->groupBy('places_description');
+
+        $format =  $group->map(function ($item) use ($title, $description) {
+            return [
+                'id' => $item->first()->places_id,
+                'console' => $item->first()->places_console,
+                'capacity' => $item->first()->places_capacity,
+                'type' => $item->first()->places_type,
+                'place' => $title,
+//                'date' => Carbon::parse($date)->format('d-m-Y'),
+                'description' => $description,
+                'games' => $item->map(function ($game) {
+                    return [
+                        'image' => $game->games_image,
+                        'game' => $game->games_game,
+                        'genre' => $game->games_genre,
+                        'player' => $game->games_player,
+                    ];
+                }),
+            ];
+        });
+
+        return $format;
+    }
+
+
     public function getSession($bokingId)
     {
         $session =  DB::table('place_time')
@@ -43,6 +83,8 @@ class PlaceService
 
     public function getBoking($bokingId, $date)
     {
+        $date = Carbon::parse($date)->format('Y-m-d');
+
         $boking =  DB::table('booking_detail')
             ->join('bookings', 'booking_detail.booking_id', '=', 'bookings.id')
             ->select(
@@ -61,18 +103,9 @@ class PlaceService
         return $boking;
     }
 
-    public function formatData($game, $session, $boking, $bokingId, $date)
+    public function getFormatSession($date, $session, $boking)
     {
-        $description = DB::table('descriptions')
-            ->where('id', $game->first()->places_description)
-            ->first()
-            ->description;
-
-        $title = DB::table('titles')
-            ->where('id', $bokingId)
-            ->first()
-            ->title;
-
+        $date = Carbon::parse($date)->format('Y-m-d');
         $session = $session->map(function ($item) use ($date, $boking) {
             $isBooked = $boking->contains(function ($bokingg) use ($item, $date) {
                 return $bokingg->bookings_session == Carbon::parse($item->session_session)->format('H:i') &&
@@ -84,30 +117,8 @@ class PlaceService
 
         })->filter()->values();
 
-        $group = $game->groupBy('places_description');
 
-        $format =  $group->map(function ($item) use ($session, $title, $date, $description) {
-            return [
-                'id' => $item->first()->places_id,
-                'console' => $item->first()->places_console,
-                'capacity' => $item->first()->places_capacity,
-                'type' => $item->first()->places_type,
-                'place' => $title,
-                'date' => Carbon::parse($date)->format('d-m-Y'),
-                'description' => $description,
-                'games' => $item->map(function ($game) {
-                    return [
-                        'image' => $game->games_image,
-                        'game' => $game->games_game,
-                        'genre' => $game->games_genre,
-                        'player' => $game->games_player,
-                    ];
-                }),
-                'session' => $session,
-            ];
-        });
-
-        return $format;
+        return $session;
     }
 }
 

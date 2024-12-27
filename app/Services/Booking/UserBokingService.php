@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Booking;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
-class BokingService
+class UserBokingService
 {
     public function bokingUser($request)
     {
@@ -30,21 +29,6 @@ class BokingService
         return $boking;
     }
 
-    public function confirmBoking($placeId ,$date)
-    {
-        $date = Carbon::parse($date)->format('Y-m-d');
-
-        $boking = DB::table('bookings')->insertGetId([
-            'name' => "admin",
-            'date' => $date,
-            'status' => 'accepted',
-            'role' => "admin",
-            'place_id' => $placeId,
-        ]);
-
-        return $boking;
-    }
-
     public function addSession($request, $boking)
     {
         foreach ($request->sessions as $session){
@@ -54,22 +38,5 @@ class BokingService
                 'session' => $sessionss,
             ]);
         }
-    }
-
-    public function unconfirmBoking($request, $placeId, $date)
-    {
-        $date = Carbon::parse($date)->format('Y-m-d');
-        $boking = DB::table('booking_detail')
-            ->join('bookings', 'booking_detail.booking_id', '=', 'bookings.id')
-            ->select('booking_detail.*')
-            ->where('bookings.date', $date)
-            ->where('bookings.place_id', $placeId)
-            ->whereIn('booking_detail.session', $request->sessions)
-            ->get();
-
-        foreach ($boking as $bokingg) {
-            DB::table('booking_detail')->where('id', $bokingg->id)->delete();
-        }
-
     }
 }

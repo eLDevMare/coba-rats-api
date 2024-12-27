@@ -43,8 +43,8 @@ class AuthController extends Controller
         if(!$token = Auth::attempt($request->only('username','password'))){
             return  response()->json([
                 'status' => false,
-                'message' => 'Unauthorized'
-            ]);
+                'message' => 'please check username and password again'
+            ], 422);
         }
 
         return response()->json([
@@ -89,6 +89,6 @@ class AuthController extends Controller
         return response()->json([
             'status' => false,
             'message' => 'Unauthorized'
-        ]);
+        ], 401);
     }
 }

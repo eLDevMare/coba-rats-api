@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->bigInteger('phone')->nullable();
+            $table->string('phone')->nullable();
             $table->date('date');
             $table->integer('duration')->nullable();
             $table->string('console')->nullable();
             $table->string('place')->nullable();
             $table->integer('total')->nullable();
-            $table->enum('type', ['reguler', 'vip'])->nullable();
+            $table->string('type')->nullable();
             $table->enum('status',["accepted", "pending", "declined"])->nullable()->default("pending");
             $table->enum('role',["admin", "users"])->default("users");
             $table->integer('place_id');

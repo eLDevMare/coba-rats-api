@@ -1,35 +1,55 @@
 <?php
 
+use App\Http\Controllers\AdminBookingController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\BookingController;
-use App\Http\Controllers\GameController;
-use App\Http\Controllers\PlaceController;
+use App\Http\Controllers\UserBookingController;
+use App\Http\Controllers\AdminGameController;
+use App\Http\Controllers\UserPlaceController;
+use App\Http\Controllers\AdminDashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/me', [AuthController::class, 'me']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
-    Route::post('/me', [AuthController::class, 'me']);
 });
-
-    Route::get('/place/{bokingId}/{date}', [PlaceController::class, 'getData']);
-    Route::post('/booking/post', [BookingController::class, 'booking']);
-    Route::patch('/booking/confirm/auto/post', [BookingController::class, 'confirmBokingAuto']);
-    Route::patch('/booking/declined/auto/post', [BookingController::class, 'declinedBokingAuto']);
-    Route::post('/booking/confirm/post/{placeId}/{date}', [BookingController::class, 'confirmBoking']);
-    Route::delete('/booking/unconfirm/post/{placeId}/{date}', [BookingController::class, 'unconfirmBoking']);
-
-    Route::get('/game', [GameController::class, 'getAllGame']);
-    Route::get('/game/{gameId}', [GameController::class, 'getGameDetail']);
-    Route::post('/game/store', [GameController::class, 'storeGame']);
-    Route::post('/game/update/{gameId}', [GameController::class, 'updateGame']);
-    Route::delete('/game/delete/{gameId}', [GameController::class, 'deleteGame']);
-    Route::post('/game/place/update/{placeId}', [GameController::class, 'updateGameRoom']);
-
-    Route::get('room/game/{place_id}', [GameController::class, 'getGameRoom']);
-    Route::get('/place/{placeId}', [PlaceController::class, 'getPlaceDetail']);
-    Route::patch('/place/post/{placeId}', [PlaceController::class, 'updatePlace']);
-
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/invalidate', [AuthController::class, 'invalidate'])->name('login');
     Route::post('/register', [AuthController::class, 'register']);
+
+
+    //User
+    Route::get('/places', [UserPlaceController::class, 'allPlace']);
+    Route::get('/place/get/{bokingId}', [UserPlaceController::class, 'getData']);
+    Route::get('/place/session/{date}/{bokingId}', [UserPlaceController::class, 'getSession']);
+
+    Route::post('/booking/post', [UserBookingController::class, 'booking']);
+
+
+
+
+
+    //Admin
+
+    //Dashboard
+    Route::get('dashboard/game/{place_id}', [AdminDashboardController::class, 'getGameDashbaord']);
+
+
+    Route::patch('/booking/confirm/auto/post', [AdminBookingController::class, 'confirmBokingAuto']);
+    Route::patch('/booking/declined/auto/post', [AdminBookingController::class, 'declinedBokingAuto']);
+    Route::post('/booking/confirm/post/{date}', [AdminBookingController::class, 'confirmBoking']);
+    Route::delete('/booking/unconfirm/post/{date}', [AdminBookingController::class, 'unconfirmBoking']);
+
+    Route::get('/game', [AdminGameController::class, 'getAllGame']);
+    Route::get('/game/{gameId}', [AdminGameController::class, 'getGameDetail']);
+    Route::post('/game/store', [AdminGameController::class, 'storeGame']);
+    Route::post('/game/update/{gameId}', [AdminGameController::class, 'updateGame']);
+    Route::delete('/game/delete/{gameId}', [AdminGameController::class, 'deleteGame']);
+    Route::post('/game/place/update/{placeId}', [AdminGameController::class, 'updateGameRoom']);
+
+
+
+    Route::get('room/game/{place_id}', [AdminGameController::class, 'getGameRoom']);
+    Route::get('/place/{placeId}', [UserPlaceController::class, 'getPlaceDetail']);
+    Route::patch('/place/post/{placeId}', [UserPlaceController::class, 'updatePlace']);
+

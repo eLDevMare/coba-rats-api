@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Games;
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
-class GameService
+class AdminGameService
 {
     public function storeGame($request){
 

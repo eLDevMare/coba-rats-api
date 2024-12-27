@@ -2,18 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\gameService;
+use App\Services\Games\AdminGameService;
+use App\Trait\GameTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
 
-class GameController extends Controller
+class AdminGameController extends Controller
 {
+    use GameTrait {
+        GameTrait::getGameRoomAdmin as gameGetGameRoomAdmin;
+    }
+
     protected $gameService;
 
-    public function __construct(GameService $gameService){
+    public function __construct(AdminGameService $gameService){
         $this->gameService = $gameService;
     }
     public function getAllGame()
@@ -23,6 +28,16 @@ class GameController extends Controller
             'status' => 'success',
             'message' => 'success get all game',
             'data' => $game
+        ]);
+    }
+
+    public function getGameRoom($placeId)
+    {
+        $result = $this->gameGetGameRoomAdmin($placeId);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'success get game room',
+            'data' => $result
         ]);
     }
 
@@ -89,26 +104,6 @@ class GameController extends Controller
         ]);
     }
 
-    public function getGameRoom($placeId)
-    {
-        $allGame = DB::table('games')->get();
-        $gameRoom = DB::table('place_game')
-            ->join('games', 'games.id', '=', 'place_game.game_id')
-            ->where('place_game.place_id', '=', $placeId)
-            ->select('games.image as game_image',
-                              'games.game as game_game',
-                              'place_game.game_id as game_id')
-            ->get();
-
-        $formatGameRoom = $this->gameService->gameRoom($gameRoom, $allGame);
-        $formatGame = $this->gameService->formatGame($allGame, $formatGameRoom);
-
-        return response()->json([
-           'status' => 'success',
-           'message' => 'success get game roo',
-            'data' => $formatGame
-        ]);
-    }
 
     public function updateGameRoom(Request $request, $placeId)
     {
