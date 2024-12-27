@@ -20,6 +20,6 @@
         "DB_PORT": "3306",
         "DB_DATABASE": "your_database_name",
         "DB_USERNAME": "your_database_username",
-        "DB_PASSWORD"": "78b2207be2fa3a2d3cdc6b7fc21ae7f90050474a"
+        "DB_PASSWORD": "78b2207be2fa3a2d3cdc6b7fc21ae7f90050474a"
     }
 }
